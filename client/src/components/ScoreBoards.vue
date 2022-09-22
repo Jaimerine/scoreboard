@@ -1,44 +1,49 @@
 <template>
-  <div>
+  <div v-cloak>
     <div class="d-flex mb-2">
       <input type="text" id="boardName" aria-label="Board Name" placeholder="Board Name" class="form-control">
       <button @click="createBoard()" class="btn btn-primary ml-2">Create Board</button>
     </div>
 
-    <table
-      data-toggle="table"
-      data-search="true"
-      class="table table-hover"
-      id="boardsTable">
-      <thead class="header">
-        <tr>
-          <th data-sortable="true">ID</th>
-          <th data-sortable="true">Name</th>
-          <th data-sortable="false"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="board in boards" :key="board.id">
-            <td class="smcol">{{ board.id }}</td>
-            <td>{{ board.name }}</td>
-            <td><button class="btn btn-primary" @click="goToBoard(board.id)">Go</button></td>
-        </tr>
-      </tbody>
-    </table>
-    
+    <status-loading :loaded="isLoaded">
+      <table :style="{visibility: isLoaded ? 'visible' : 'hidden'}"
+        data-toggle="table"
+        data-search="true"
+        class="table table-hover"
+        id="boardsTable">
+        <thead class="header">
+          <tr>
+            <th data-sortable="true">ID</th>
+            <th data-sortable="true">Name</th>
+            <th data-sortable="false"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="board in boards" :key="board.id">
+              <td class="smcol">{{ board.id }}</td>
+              <td>{{ board.name }}</td>
+              <td><button class="btn btn-primary" @click="goToBoard(board.id)">Go</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </status-loading>
   </div>
 </template>
 
 <script>
 // import { mapActions, mapMutations, mapGetters, mapState } from "vuex";
 import BoardDataService from "../services/BoardDataService.js";
+import StatusLoading from "../components/StatusLoading.vue";
 
 export default {
-  components: {   },
+  components: {
+    StatusLoading
+  },
   name: "ScoreBoards",
   data() {
     return {
       boards: [],
+      isLoaded: false
     };
   },
   async created() {
@@ -50,6 +55,7 @@ export default {
         .catch(e => {
           console.log(e);
         });
+    setTimeout(()=>{this.isLoaded = true;}, 1000)
 
   },
   methods: {

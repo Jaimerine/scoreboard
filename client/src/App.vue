@@ -1,7 +1,23 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <router-link to="/" class="navbar-brand">Wordlers</router-link>
+    <nav class="navbar navbar-expand navbar-dark">
+      <router-link to="/" class="navbar-brand">
+        <img src="./assets/scorecard-logo.svg" alt="scorecard logo" class="logo"/>
+      </router-link>
+
+<!--      <rough-svg-->
+<!--          width="500px"-->
+<!--          height="500px"-->
+<!--          :options="options"-->
+<!--      >-->
+
+<!--      <rough-line-->
+<!--          :x1="1"-->
+<!--          :y1="1"-->
+<!--          :x2="20"-->
+<!--          :y2="20"-->
+<!--      />-->
+<!--      </rough-svg>-->
       <!-- <div class="navbar-nav mr-auto">
         <li class="nav-item">
           <router-link to="/board/1" class="nav-link">Board</router-link>
@@ -9,6 +25,7 @@
       </div> -->
     </nav>    
     <div id="main" class="inner-content container mt-3">
+
       <transition name="fade">
         <router-view />
       </transition>
@@ -22,11 +39,17 @@
 import { mapActions, mapMutations, mapGetters, mapState } from "vuex";
 // import ScoreBoards from './components/ScoreBoards.vue'
 import BoardDataService from "./services/BoardDataService.js";
+// import {RoughLine} from "vue-rough/src/components"
+// import {RoughSvg} from "vue-rough/src/components"
+// import {RoughLine, RoughSvg} from "vue-rough/src/components";
 // import User from "./models/User.js";
+// import {RoughLine, RoughSvg} from "roughjs"
 
 export default {
   name: "app",
   components: {
+    // RoughLine,
+    // RoughSvg
     // ScoreBoards
   },
   data() {
@@ -113,23 +136,18 @@ export default {
 
 <style lang="scss">
 
-  /*************** BASE STYLES ***************/
-  :root {
-      --primary-colour: #89c1d7; //blue
-      --secondary-colour: #000511; //black
-      --border: solid 3px var(--secondary-colour);
-      --accent-colour-1: #f48d24; //orange
-      --accent-colour-2: #419e43; //green
-      --font-colour: var(--secondary-colour);
-      --card-background: white;
-  }
+  @import "./styles/variables";
 
+  .logo {
+    height: 50px;
+    padding-bottom: 7px;
+  }
 
   //***************SCROLLBARS***************
   //firefox
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--primary) var(--accent-colour-1);
+    scrollbar-color: var(--primary-colour) var(--secondary-colour);
   }
 
   //chrome, edge, safari
@@ -137,10 +155,10 @@ export default {
     width: 10px;
   }
   *::-webkit-scrollbar-track {
-    background: var(--accent-colour-1);
+    background: var(--secondary-colour);
   }
   *::-webkit-scrollbar-thumb {
-    background-color: var(--primary);
+    background-color: var(--primary-colour);
   }
 
   //***************DRAGGABLE***************
@@ -186,47 +204,123 @@ export default {
 
   #app {
     height: 100vh;
-    width: 100vw
+    width: 100vw;
+    background-color: var(--background-colour);
+    //background-image: url("./assets/natural-paper.png");
   }
 
   .btn.btn-icon {
-    padding: 0;
-    font-size: 1.8rem;
-    line-height: 1.8rem;
-    color: var(--primary);
+    font-size: 1.2rem;
+    line-height: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    padding: .9rem;
   }
 
   // .inner-content {
   //   height: 100%;
   // }
 
-  
-  // @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Patrick+Hand&family=Comic+Neue:wght@300;400;700&display=swap');
-  
-
+   @import url("https://use.typekit.net/dmu7pgf.css");
+   @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Patrick+Hand&family=Comic+Neue:wght@300;400;700&display=swap');
 
   * {
     box-sizing: border-box;
-    // font-family: 'Comic Neue', sans-serif;
-    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
-    // color: var(--font-colour);
-    // margin: 0;
-    // padding: 0;
+    //font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+    //font-family: 'Patrick Hand', sans-serif;
+    font-family: aaux-next, sans-serif;
+    font-style: normal;
+    font-weight: 300;
+  }
+
+  body, .apexcharts-text, .form-control, button.btn {
+    font-size: 1.2rem !important;
+  }
+
+  .apexcharts-text {
+    font-size: 1rem !important;
+    font-family: aaux-next, sans-serif !important;
+    font-style: normal;
+    font-weight: 300;
+  }
+
+  .btn, input::placeholder, .header, .apexcharts-text, .modal-body {
+    text-transform: lowercase !important;
   }
 
   .navbar > a {
-    text-transform: uppercase;
+    text-transform: lowercase;
+    font-size: 1.7rem;
   }
-  
-  // body {
-  //     // background-color: var(--primary-colour);
-  //     margin: 0;
-  // }
 
-  h1, h2, h3, button {
-      text-transform: uppercase;
-      font-family: 'Patrick Hand', sans-serif;
+  .navbar-dark {
+    background-color: $secondary;
   }
+
+  //tables
+  .table-hover {
+    tbody tr:hover:not(tr.details), tr.detail-view {
+      background-color: var(--primary-colour-light15) !important;
+    }
+    tr.details {
+      background-color: var(--primary-colour-light5) !important;
+    }
+  }
+
+  .table-hover {
+    tbody tr:hover, tbody tr:hover ~ tr {
+      .avatar-container .arrow {
+        visibility: visible;
+      }
+    }
+  }
+
+  //avatar
+  .avatar {
+    border: solid 2px var(--secondary-colour);
+    border-radius: 50%;
+    margin: 5px 20px 5px 10px;
+    height: 2.3rem;
+    width: 2.3rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--secondary-colour);
+    text-transform: lowercase;
+    outline: solid 2px var(--secondary-colour);
+    outline-offset: 6px;
+    color: var(--font-colour-light);
+  }
+
+  .avatar-container {
+    position: relative;
+
+    .arrow {
+      visibility: hidden;
+      position: absolute;
+      height: 2.6rem;
+      transform: rotate(275deg);
+      left: -1rem;
+      top: -1.3rem;
+    }
+  }
+
+  //card
+  .card {
+    background: var(--background-colour);
+    border: 3px solid var(--secondary-colour);
+    padding: 1rem;
+    border-radius: 25px;
+  }
+
+  //h1, h2, h3, button {
+  //    text-transform: uppercase;
+  //    font-family: 'Patrick Hand', sans-serif;
+  //}
 
   h1 {
       font-size: 2.2rem;

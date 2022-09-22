@@ -1,4 +1,5 @@
 import scoreHandler from "./score.listener.js"
+import playerHandler from "./player.listener.js"
 
 export let boardId;
 
@@ -41,6 +42,7 @@ const boardHandler = (io, socket) => {
 
   //handle score updates
   scoreHandler(io, socket, boardId);
+  playerHandler(io, socket, boardId)
 
 }
 

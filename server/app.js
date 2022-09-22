@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 import db from "./models/index.js";
 db.mongoose
   .connect(db.url, {
-    dbName: "Wordlers",
+    dbName: "Scorecard",
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

@@ -4,10 +4,10 @@
       <div class="modal-content">
         <div class="modal-header">
           <div>
-            <h4>Add or Edit a Score for {{ player.name }}</h4>
+            <h4>{{ player.name + (player.name[player.name.length - 1].toLowerCase() === "s" ? "' score" : "'s score")}}</h4>
           </div>
           <button class="btn-close" @click="closeModal(false)" aria-label="close">
-            <i class="fas fa-times" aria-hidden="true"></i>
+            <font-awesome-icon icon="fas fa-times" aria-hidden="true"/>
           </button>
         </div>
         <div class="modal-body">
@@ -156,13 +156,16 @@ export default {
   .modal-header {
     .btn-close {
       font-size: 1.2rem;
-      transition: color .2s;
-      &:hover {
-        color: var(--primary);
+      transition: color .2s, transform .3s;
+      background: transparent;
+      border: none;
+      outline: none;
+      margin-left: 20px;
+
+      &:hover, &:focus, &:active {
+        color: var(--primary-colour);
+        transform: scale(1.1);
       }
-    }
-    p {
-      margin: 0;
     }
   }
   .modal-content {

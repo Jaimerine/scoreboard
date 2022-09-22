@@ -1,18 +1,23 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 
-import "vuetify/styles";
-import { createVuetify } from "vuetify";
-import { loadFonts } from "./plugins/webfontloader";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
+// import VueRough from 'vue-rough';
 
-const vuetify = createVuetify({
-  components,
-  directives,
-});
 
-loadFonts();
+// import './styles/index.css'
+
+// import "vuetify/styles";
+// import { createVuetify } from "vuetify";
+// import { loadFonts } from "./plugins/webfontloader";
+// import * as components from "vuetify/components";
+// import * as directives from "vuetify/directives";
+
+// const vuetify = createVuetify({
+//   components,
+//   directives,
+// });
+
+// loadFonts();
 
 import store from "./store";
 import router from "./router";
@@ -31,12 +36,16 @@ import "bootstrap";
 
 import { SetupCalendar } from "v-calendar";
 
+import VueApexCharts from "vue3-apexcharts";
+
 const app = createApp(App);
 
 app.use(store);
 app.use(router);
-app.use(vuetify);
+// app.use(vuetify);
 app.use(SetupCalendar, {});
+app.use(VueApexCharts);
+// app.use(VueRough);
 app.use(
   new VueSocketIO({
     debug: true,
@@ -61,6 +70,7 @@ const tooltip = {
     const tooltip = new Tooltip(el);
   },
 }
+
 app.directive("tooltip", tooltip);
 
 app.mount("#app");
