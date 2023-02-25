@@ -11,7 +11,7 @@ class PlayerDataService {
     return http.post("/players/", data);
   }
   update(id, data) {
-    return http.put(`/players/${id}`, data);
+    return http.patch(`/players/${id}`, data);
   }
   delete(id) {
     return http.delete(`/players/${id}`);

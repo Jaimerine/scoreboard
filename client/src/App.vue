@@ -4,32 +4,15 @@
       <router-link to="/" class="navbar-brand">
         <img src="./assets/scorecard-logo.svg" alt="scorecard logo" class="logo"/>
       </router-link>
-
-<!--      <rough-svg-->
-<!--          width="500px"-->
-<!--          height="500px"-->
-<!--          :options="options"-->
-<!--      >-->
-
-<!--      <rough-line-->
-<!--          :x1="1"-->
-<!--          :y1="1"-->
-<!--          :x2="20"-->
-<!--          :y2="20"-->
-<!--      />-->
-<!--      </rough-svg>-->
-      <!-- <div class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <router-link to="/board/1" class="nav-link">Board</router-link>
-        </li>
-      </div> -->
     </nav>    
     <div id="main" class="inner-content container mt-3">
-
       <transition name="fade">
         <router-view />
       </transition>
     </div>
+    <footer>
+        <p>made with <font-awesome-icon icon="fa-solid fa-heart" /> by aunty jammy</p>
+    </footer>
   </div>
   <div id="modal"></div>
 </template>
@@ -37,20 +20,10 @@
 <script>
 
 import { mapActions, mapMutations, mapGetters, mapState } from "vuex";
-// import ScoreBoards from './components/ScoreBoards.vue'
-import BoardDataService from "./services/BoardDataService.js";
-// import {RoughLine} from "vue-rough/src/components"
-// import {RoughSvg} from "vue-rough/src/components"
-// import {RoughLine, RoughSvg} from "vue-rough/src/components";
-// import User from "./models/User.js";
-// import {RoughLine, RoughSvg} from "roughjs"
 
 export default {
   name: "app",
   components: {
-    // RoughLine,
-    // RoughSvg
-    // ScoreBoards
   },
   data() {
     return {
@@ -67,7 +40,7 @@ export default {
     },
     disconnect() {
         this.connected = false;
-        alert('Oops, something has gone wrong. You have been disconnected from the game.')
+        alert('Oops, something has gone wrong. Please try refreshing the page.')
     },
     // newUserJoined(data) {
     //     this.updateUsers(data[2]);
@@ -97,46 +70,44 @@ export default {
     // ...mapActions(["initialize"]),
     // ...mapMutations(["addUser", "removeUser", "addNotification", "updateUsers", "setActiveUserId"]),
 
-    updateUsers(serverUsers) {
-        let removedUsers = this.getUsers.filter((p) =>
-            serverUsers.findIndex((s) => s.id === p.id)
-        );
-        for (let user of removedUsers) {
-            this.removeUser(user.id);
-        }
-        for (let i = 0; i < serverUsers.length; i++) {
-            let userFromServer = serverUsers[i];
-            if (!this.userExists(userFromServer)) {
-                // this.addUser(new User(userFromServer.name, userFromServer.id, userFromServer.roomId));
-            }
-        }
-    },
-    userExists(userFromServer) {
-        for (let i = 0; i < this.users.length; i++) {
-            if (this.users[i].id === userFromServer.id) {
-                return true;
-            }
-        }
-        return false;
-    },
-    createUser(name) {
-        const newUser = new User(name, this.userId, this.roomId);
-        this.addUser(newUser);
-        this.setActiveUserId(this.userId);
-        this.$socket.emit("newUserJoined", newUser)
-        this.joinedGame = true;
-        this.initialize();
-    },
-    updateScore(user, score) {
-        this.$socket.emit("updateScore", user, score);
-    }
+    // updateUsers(serverUsers) {
+    //     let removedUsers = this.getUsers.filter((p) =>
+    //         serverUsers.findIndex((s) => s.id === p.id)
+    //     );
+    //     for (let user of removedUsers) {
+    //         this.removeUser(user.id);
+    //     }
+    //     for (let i = 0; i < serverUsers.length; i++) {
+    //         let userFromServer = serverUsers[i];
+    //         if (!this.userExists(userFromServer)) {
+    //             // this.addUser(new User(userFromServer.name, userFromServer.id, userFromServer.roomId));
+    //         }
+    //     }
+    // },
+    // userExists(userFromServer) {
+    //     for (let i = 0; i < this.users.length; i++) {
+    //         if (this.users[i].id === userFromServer.id) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // },
+    // createUser(name) {
+    //     const newUser = new User(name, this.userId, this.roomId);
+    //     this.addUser(newUser);
+    //     this.setActiveUserId(this.userId);
+    //     this.$socket.emit("newUserJoined", newUser)
+    //     this.joinedGame = true;
+    //     this.initialize();
+    // },
+    // updateScore(user, score) {
+    //     this.$socket.emit("updateScore", user, score);
+    // }
   },
 }
 </script>
 
 <style lang="scss">
-
-  @import "./styles/variables";
 
   .logo {
     height: 50px;
@@ -203,42 +174,94 @@ export default {
   }
 
   #app {
-    height: 100vh;
-    width: 100vw;
     background-color: var(--background-colour);
     //background-image: url("./assets/natural-paper.png");
   }
 
-  .btn.btn-icon {
-    font-size: 1.2rem;
-    line-height: 0;
-    width: 1.6rem;
-    height: 1.6rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    padding: .9rem;
+  //buttons
+  button.btn {
+    white-space: nowrap;
+
+    &:hover {
+      border-color: transparent;
+      transform: scale(1.03);
+    }
+
+    &.btn-primary {
+      color: var(--font-colour-light);
+
+      &:hover {
+        background-color: darken($primary, 5%);
+      }
+    }
+
+    &.btn-secondary {
+      &:focus, &:active {
+        background-color: $secondary;
+      }
+
+      &:hover {
+        background-color: darken($secondary, 5%);
+      }
+
+      &.btn-icon.btn-table:hover {
+        background-color: scale-color($secondary, $lightness: 80%) !important;
+      }
+    }
+
+    &.btn-icon {
+      border-color: transparent;
+      font-size: 1.2rem;
+      line-height: 0;
+      width: 1.6rem;
+      height: 1.6rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      padding: .9rem;
+      transition: none;
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      @include media-breakpoint-down(sm) {
+        font-size: .9rem !important;
+      }
+    }
   }
 
-  // .inner-content {
-  //   height: 100%;
-  // }
+   .inner-content.container {
+     max-width: 90vw;
+     @include media-breakpoint-up(xxl) {
+       max-width: 1200px;
+     }
+     @include media-breakpoint-down(md) {
+       max-width: 95vw;
+     }
+     @include media-breakpoint-down(sm) {
+       max-width: 100vw;
+     }
+   }
 
    @import url("https://use.typekit.net/dmu7pgf.css");
-   @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Patrick+Hand&family=Comic+Neue:wght@300;400;700&display=swap');
 
   * {
     box-sizing: border-box;
-    //font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
-    //font-family: 'Patrick Hand', sans-serif;
     font-family: aaux-next, sans-serif;
     font-style: normal;
-    font-weight: 300;
+    font-weight: 400;
+    line-height: 1.2;
   }
 
   body, .apexcharts-text, .form-control, button.btn {
     font-size: 1.2rem !important;
+    @include media-breakpoint-down(md) {
+      font-size: 1.1rem !important;
+    }
+    @include media-breakpoint-down(sm) {
+      font-size: 1rem !important;
+    }
   }
 
   .apexcharts-text {
@@ -252,38 +275,175 @@ export default {
     text-transform: lowercase !important;
   }
 
-  .navbar > a {
-    text-transform: lowercase;
-    font-size: 1.7rem;
+  #main {
+    margin-top: -70px !important;
+
+    @include media-breakpoint-down(sm) {
+      padding-right: 0;
+      padding-left: 0;
+    }
   }
 
-  .navbar-dark {
-    background-color: $secondary;
+  #app .card {
+    border-radius: .5rem;
+    border: 3px solid var(--secondary-colour);
+    background-color: var(--background-colour);
+
+    &.main-card {
+      border: 5px solid var(--secondary-colour);
+
+      @include media-breakpoint-down(sm) {
+        padding: .5rem;
+      }
+    }
+
+    @include media-breakpoint-down(sm) {
+      padding: .5rem;
+    }
+  }
+
+  #app .navbar {
+    height: 162px;
+
+    &.navbar-expand {
+      align-items: flex-start;
+    }
+
+    & > .navbar-brand {
+      margin-top: 12px;
+    }
+
+    & > a {
+      text-transform: lowercase;
+      font-size: 1.7rem;
+    }
+
+    &.navbar-dark {
+      background-color: var(--secondary-colour)
+    }
   }
 
   //tables
-  .table-hover {
-    tbody tr:hover:not(tr.details), tr.detail-view {
-      background-color: var(--primary-colour-light15) !important;
-    }
-    tr.details {
-      background-color: var(--primary-colour-light5) !important;
-    }
-  }
+  table.table {
+    td, th {
+      padding: 0.5rem;
 
-  .table-hover {
-    tbody tr:hover, tbody tr:hover ~ tr {
-      .avatar-container .arrow {
-        visibility: visible;
+      @include media-breakpoint-down(xs) {
+        padding: 0.2rem;
       }
     }
+
+    thead th {
+      font-size: 1.4rem;
+      line-height: 1.2;
+      border-bottom: solid 3px var(--primary);
+
+      @include media-breakpoint-down(xs) {
+        font-size: 1.2rem;
+      }
+    }
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    tr.empty td {
+      padding: 4px 0;
+    }
+
+    tr:not(.empty) {
+      &:hover, &:focus, &:active, &.detail-view {
+        .avatar-container .arrow {
+          display: inline;
+        }
+
+        & > td:not(.score-cell):not(.details-cell) {
+          color: var(--font-colour-light);
+        }
+      }
+
+      td {
+        border-top: solid 3px transparent;
+        border-bottom: solid 3px transparent;
+        padding: 10px;
+
+        @include media-breakpoint-down(sm) {
+          padding: 3px;
+        }
+
+        &:first-child {
+          border-top-left-radius: 0.5rem;
+          border-bottom-left-radius: 0.5rem;
+          border-left: solid 3px transparent;
+        }
+
+        &:last-child {
+          border-top-right-radius: 0.5rem;
+          border-bottom-right-radius: 0.5rem;
+          border-right: solid 3px transparent;
+        }
+      }
+    }
+
+    tr:hover:not(.empty), tr.detail-view, tr.details {
+      .btn-secondary {
+        background-color: var(--font-colour-light);
+        color: var(--font-colour);
+      }
+
+      td {
+        transition: color .3s, background-color .4s;
+        background-color: var(--secondary-colour);
+
+        &.score-cell {
+          line-height: 1rem;
+        }
+
+        & .avatar.target {
+          outline-color: var(--font-colour-light);
+          background: var(--font-colour-light);
+          color: var(--font-colour);
+        }
+
+        & span.player-name {
+          color: var(--font-colour-light);
+        }
+      }
+    }
+
+    tr.details:not(.empty) td {
+      background-color: var(--secondary-colour) !important;
+      border-top: none;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+
+      & > div .card {
+        width: 50%;
+        &.chart-average {
+          margin-right: .5rem;
+          margin-left: 1rem;
+        }
+        &.chart-period {
+          margin-left: .5rem;
+          margin-right: 1rem;
+        }
+
+        @include media-breakpoint-down(sm) {
+          flex-wrap: wrap;
+          width: 100%;
+        }
+      }
+    }
+
+    tr.detail-view:not(.empty) td {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
   }
 
-  //avatar
-  .avatar {
-    border: solid 2px var(--secondary-colour);
+  //target (avatar & scores)
+  .target {
     border-radius: 50%;
-    margin: 5px 20px 5px 10px;
+    margin: 10px 20px 10px 10px;
     height: 2.3rem;
     width: 2.3rem;
     display: inline-flex;
@@ -291,205 +451,209 @@ export default {
     align-items: center;
     background: var(--secondary-colour);
     text-transform: lowercase;
-    outline: solid 2px var(--secondary-colour);
+    outline: solid 3px var(--secondary-colour);
     outline-offset: 6px;
-    color: var(--font-colour-light);
+
+    @include media-breakpoint-down(sm) {
+      &.avatar {
+        margin: 6px 12px 6px 6px;
+      }
+      height: 2rem;
+      width: 2rem;
+      outline-offset: 4px;
+    }
+
+    @include media-breakpoint-down(xs) {
+      height: 1.6rem;
+      width: 1.6rem;
+      outline-offset: 3px;
+    }
+
+    &.score {
+      margin: 0 2px;
+      //height: 2.3rem;
+      //width: 2.3rem;
+      background: var(--primary-colour-light15);
+      outline-color: var(--primary-colour-light15);
+    }
+
+    &.avatar {
+      color: var(--font-colour-light);
+    }
   }
 
   .avatar-container {
     position: relative;
+    display: flex;
 
     .arrow {
-      visibility: hidden;
+      display: none;
       position: absolute;
-      height: 2.6rem;
-      transform: rotate(275deg);
-      left: -1rem;
-      top: -1.3rem;
+      //transform: rotate(275deg);
+      height: 3.8rem;
+      left: -2.1rem;
+      top: -2.6rem;
+      animation-name: arrow;
+      animation-duration: .3s;
+      animation-fill-mode: forwards
     }
   }
 
-  //card
-  .card {
-    background: var(--background-colour);
-    border: 3px solid var(--secondary-colour);
-    padding: 1rem;
-    border-radius: 25px;
+  .avatar-container-inner {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    min-width: 150px;
+
+    @include media-breakpoint-down(sm) {
+      max-width: 150px;
+    }
+
+    @include media-breakpoint-down(xs) {
+      max-width: 150px;
+    }
   }
 
-  //h1, h2, h3, button {
-  //    text-transform: uppercase;
-  //    font-family: 'Patrick Hand', sans-serif;
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .card {
+      background: var(--background-colour);
+      border: 3px solid var(--secondary-colour);
+      padding: 1rem;
+      border-radius: 1.2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+
+      @include media-breakpoint-down(md) {
+        font-size: 2rem !important;
+      }
+      @include media-breakpoint-down(sm) {
+        font-size: 1.8rem !important;
+      }
+    }
+
+    h1, h2, h3, h4, footer {
+      text-transform: lowercase;
+    }
+
+    h2 {
+        font-size: 2rem;
+
+      @include media-breakpoint-down(md) {
+        font-size: 1.8rem !important;
+      }
+      @include media-breakpoint-down(sm) {
+        font-size: 1.6rem !important;
+      }
+    }
+
+    h3 {
+        font-size: 1.5rem;
+      @include media-breakpoint-down(md) {
+        font-size: 1.4rem !important;
+      }
+      @include media-breakpoint-down(sm) {
+        font-size: 1.3rem !important;
+      }
+    }
+
+    h4 {
+        font-size: 1.2rem;
+    }
+
+    .editable-cell {
+      &:not(.form-control) {
+        caret-color: transparent;
+        &:not(.score) {
+          outline: none;
+        }
+      }
+      &.form-control {
+        color: var(--font-colour);
+        display: inline;
+        margin-right: 4px;
+        &.score {
+          display: inline-block;
+        }
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    .sort-arrows {
+      & > .sort-arrow {
+        margin-bottom: -.9rem;
+        height: 1.5rem;
+        cursor: pointer;
+        &.selected {
+          color: var(--primary-colour);
+        }
+      }
+    }
+
+    footer {
+      .fa-heart {
+        color: var(--primary-colour);
+      }
+      p {
+        margin: 0;
+      }
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      background: var(--secondary);
+      color: white;
+      padding: 20px;
+      margin-top: auto;
+    }
+  }
+
+  //@keyframes arrow {
+  //  0%,
+  //  100% {
+  //    left: calc(50% - 75%);
+  //    transform: rotateZ(275deg);
+  //  }
+  //  21% {
+  //    left: calc(50% - 170px);
+  //  }
+  //  24%, 79% {
+  //    left: calc(100% - 350px);
+  //    transform-origin: right;
+  //    transform: rotateZ(275deg);
+  //  }
+  //  80%, 82%, 84% {
+  //    transform-origin: right;
+  //    transform: rotateZ(200deg);
+  //    left: calc(100% - 305px);
+  //  }
+  //  81%, 83%, 85% {
+  //    transform-origin: right;
+  //    transform: rotateZ(200deg);
+  //    left: calc(100% - 305px);
+  //  }
+  //  86%, 95% {
+  //    transform-origin: right;
+  //    transform: rotateZ(275deg);
+  //    left: calc(100% - 305px);
+  //  }
   //}
 
-  h1 {
-      font-size: 2.2rem;
-      padding-bottom: 5px;
-  }
-
-  h2 {
-      font-size: 2rem;
-      padding-bottom: 5px;
-  }
-
-  h3 {
-      font-size: 1.5rem;
-      padding-bottom: 5px;
-  }
-
-  h4 {
-      font-size: 1.8rem;
-      padding-bottom: 5px;
-  }
-
-  p {
-      font-size: 1.4rem;
-  }
-
-  // ul {
-  //     padding-left: 15px;
-  // }
-
-  button {
-  //     // background: var(--primary-colour);
-  //     // font-weight: bold;
-  //     // margin: 10px 8px;
-  //     // font-size: 1.3rem;
-  //     transition: all .2s;
-      white-space: nowrap;
-  }
-
-  // button, input {
-  //     padding: 12px;
-  //     border-radius: 6px;
-  //     border: var(--border);
-  //     border-width: 2px;
-
-  //     &.btn-sm {
-  //     padding: 5px 10px;
-  //     font-size: 1.2rem;
-  //     }
-
-  //     &:focus, &:active {
-  //     outline: solid 2px var(--primary-colour);
-  //     }
-  // }
-
-  button:hover {
-      // background-color: var(--accent-colour-1);
-      transform: scale(1.01);
-  }
-
-  // input {
-  //     font-size: 1.6rem;
-  //     padding: 11px 12px;
-  // }
-
-  // .text-combo {
-  //     margin-top: 16px;
-
-  //     input {
-  //     width: calc(100% - 122px);
-  //     }
-
-  //     button {
-  //     margin-right: 0;
-  //     }
-  // }
-
-  // .flex {
-  //     display: flex;
-  // }
-
-  // .flex-row {
-  //     flex-direction: row;
-  //     align-items: center;
-  //     justify-content: center;
-  // }
-
-  // .flex-col {
-  //     flex-direction: column;
-  // }
-
-  // .full {
-  //     width: 100%;
-  //     height:80vh;
-  // }
-
-  // .card {
-  //     background: var(--card-background);
-  //     padding: 20px;
-  //     border-radius: 5px;
-  //     border: var(--border);
-  //     margin-bottom: 10px;
-  // }
-
-  // .banner {
-  //     background: var(--card-background);
-  //     margin: 0 0 10px;
-  //     // padding: 20px 0;
-  //     width: 100%;
-  //     // border-bottom: var(--border);
-  //     padding: 20px 0 0;
-
-  //     img {
-  //     max-height: 52px;
-  //     width: auto;
-  //     }
-  // }
-
-  // .game {
-  //     max-width: 1500px;
-  //     margin: 0 auto;
-  //     display: flex;
-  //     justify-content: center;
-  //     align-items: center;
-
-  //     border: var(--border);
-  //     border-radius: 5px;
-  //     height: calc(100vh - 117px);
-  //     margin: 20px;
-  //     background: #89c1d738;
-
-  //     .join {
-  //     justify-content: center;
-  //     align-content: center;
-  //     align-items: center;
-  //     max-width: 500px;
-  //     padding: 30px 45px;
-  //     // margin-top: 30px;
-
-  //     }
-
-  //     .game-start button {
-  //     margin-left: 0;
-  //     }
-  // }
-
-  // .pane {
-  //     height: 80vh;
-  //     overflow-y: auto;
-  // }
-
-  // .notification-pane {
-  //     width: 30%;
-  //     border-left: var(--border);
-  //     padding: 0 10px;
-
-  //     button {
-  //     padding: 9px;
-  //     font-size: 1rem;
-  //     }
-
-  //     input {
-  //     padding: 8px;
-  //     font-size: 1.2rem;
-  //     }
-  // }
-
-  // .game-pane {
-  //     width: 70%;
-  //     margin: 0 10px;
-  // }
+  //@keyframes arrow {
+  //  0% {
+  //    left: -80px;
+  //  }
+  //  100% {
+  //    left: -40px;
+  //    top: -40px;
+  //  }
+  //}
 
 </style>

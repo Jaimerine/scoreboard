@@ -1,5 +1,6 @@
 import db from "../models/index.js";
 const Score = db.scores;
+const Board = db.scores;
 
 const create = (req, res) => {
   //validate request
@@ -30,6 +31,7 @@ const create = (req, res) => {
   score
     .save(score)
     .then((data) => {
+      Board.findByIdAndUpdate(req.body.boardId, { updatedAt: new Date() })
       res.status(200).send(data);
     })
     .catch((err) => {
@@ -40,6 +42,37 @@ const create = (req, res) => {
     });
 };
 
+const update = (req, res) => {
+  //validate request
+  if (!req.body.score || Number.isNaN(req.body.score)) {
+    res.status(400).send({ message: "Score cannot be empty!" });
+    return;
+  }
+  if (!req.params.id) {
+    res.status(400).send({ message: "Score Id cannot be empty!" });
+    return;
+  }
+
+  //update player
+  db.scores.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          score: req.body.score
+        },
+      },
+      { upsert: false } //creates new score, if doesn't exist
+  )
+      .then(() => {
+        res.status(200).send({ message: "Score successfully updated." });
+      })
+      .catch ((err) => {
+        res.status(500).send({
+          message:
+              err.message || "An error occurred while updating the score.",
+        });
+      })
+}
 
 //retrieve all scores for user in board
 const findByBoardAndPlayer = (req, res) => {
@@ -91,7 +124,7 @@ const findByBoard = (req, res) => {
 };
 
 
-const scores = { create, findByBoardAndPlayer, findByBoard };
+const scores = { create, update, findByBoardAndPlayer, findByBoard };
 
 export default scores;
 

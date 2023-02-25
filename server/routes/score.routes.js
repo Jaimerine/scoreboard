@@ -8,6 +8,10 @@ scoreRouter.post("/", scores.create);
 // Retrieve all scores by user and by board
 // scoreRouter.get("/", scores.findAll);
 scoreRouter.get("/", scores.findByBoard);
+
+//update player
+scoreRouter.patch("/:id", scores.update);
+
 // // Retrieve all published users
 // router.get("/published", users.findAllPublished);
 // Retrieve a single message with id

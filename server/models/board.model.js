@@ -1,7 +1,7 @@
 const board = (mongoose) => {
-  var schema = mongoose.Schema(
+  const schema = mongoose.Schema(
     {
-      name: String,
+      name: { type: String, required: true, minLength: 1 },
       players: [
         {
           playerId: {
@@ -14,6 +14,10 @@ const board = (mongoose) => {
           },
         },
       ],
+      settings: {
+        minScore: Number,
+        maxScore: Number
+      }
     },
     { timestamps: true }
   );
@@ -22,8 +26,8 @@ const board = (mongoose) => {
     object.id = _id;
     return object;
   });
-  const Board = mongoose.model("board", schema, "board");
-  return Board;
+
+  return mongoose.model("board", schema, "board");
 };
 
 export default board;

@@ -5,7 +5,7 @@ import http from "http";
 const httpServer = http.Server(app);
 
 var corsOptions = {
-  origin: "http://localhost:8080",
+  origin: "http://localhost:8081",
 };
 app.use(cors(corsOptions));
 
@@ -13,12 +13,12 @@ app.use(cors(corsOptions));
 import { Server } from "socket.io";
 const io = new Server(httpServer, {
   cors: {
-    origins: ["http://localhost:8080"],
+    origins: ["http://localhost:8080", "http://localhost:8081"],
   },
 });
 
 //set port, listen for requests
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.SERVER_PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });

@@ -1,5 +1,5 @@
 const message = (mongoose) => {
-  var schema = mongoose.Schema(
+  const schema = mongoose.Schema(
     {
       name: String,
       content: String,
@@ -11,8 +11,8 @@ const message = (mongoose) => {
     object.id = _id;
     return object;
   });
-  const Message = mongoose.model("message", schema, "message");
-  return Message;
+
+  return mongoose.model("message", schema, "message");
 };
 
 export default message;

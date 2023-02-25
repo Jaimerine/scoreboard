@@ -1,24 +1,5 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-
-// import VueRough from 'vue-rough';
-
-
-// import './styles/index.css'
-
-// import "vuetify/styles";
-// import { createVuetify } from "vuetify";
-// import { loadFonts } from "./plugins/webfontloader";
-// import * as components from "vuetify/components";
-// import * as directives from "vuetify/directives";
-
-// const vuetify = createVuetify({
-//   components,
-//   directives,
-// });
-
-// loadFonts();
-
 import store from "./store";
 import router from "./router";
 
@@ -30,22 +11,18 @@ library.add(fas, far);
 
 import VueSocketIO from "vue-3-socket.io";
 import SocketIO from "socket.io-client";
-
-import "./styles/_variables.scss";
 import "bootstrap";
-
 import { SetupCalendar } from "v-calendar";
-
 import VueApexCharts from "vue3-apexcharts";
+import timeago from 'vue-timeago3'
 
 const app = createApp(App);
 
 app.use(store);
 app.use(router);
-// app.use(vuetify);
 app.use(SetupCalendar, {});
 app.use(VueApexCharts);
-// app.use(VueRough);
+app.use(timeago);
 app.use(
   new VueSocketIO({
     debug: true,

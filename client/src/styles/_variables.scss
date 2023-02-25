@@ -1,11 +1,11 @@
 // Place SASS variable overrides here
 
 :root {
- --primary-colour: rgb(62, 180, 137); //mint green
+ --primary-colour: #3eb489; //rgb(62, 180, 137); //mint green
  --primary-colour-light5: rgb(62, 180, 137, 0.05);
  --primary-colour-light10: rgb(62, 180, 137, 0.10);
- --primary-colour-light15: rgb(62, 180, 137, 0.15);
- --secondary-colour: #3b3b3b; //black
+ --primary-colour-light15: #def0e8; //rgb(62, 180, 137, 0.15);
+ --secondary-colour: #4f4f4f; //#3b3b3b; //black
  --border: solid 3px var(--secondary-colour);
  //--accent-colour-1: #f48d24; //orange
  //--accent-colour-2: #419e43; //green
@@ -15,26 +15,28 @@
  --font-colour-light: var(--background-colour);
 }
 
-$primary: #3eb489;
-$secondary: #3b3b3b;
-$body-bg: #fafaf9;
-$body-color: $secondary;
+$font-color: #4f4f4f;
 
- //Bootstrap override
+//Bootstrap override
+ $primary: #3eb489;
+ $secondary: #4f4f4f;
+ $body-bg: #fafaf9;
+ $body-color: $secondary;
  $font-size-root: 18px;
  $theme-colors: (
    "primary": $primary,
    "secondary": $secondary
  );
 
-//@tailwind base;
-//@tailwind components;
-//@tailwind utilities;
-
-//$primary: #6aaa64; //green
-//$secondary: #86888a;
-
-@import "bootstrap/dist/css/bootstrap.min.css";
-@import 'bootstrap/scss/bootstrap.scss';
+//media breakpoints
+ $grid-breakpoints: (
+         xxs: 0,
+         xs: 425px,
+         sm: 600px,
+         md: 774px,
+         lg: 900px,
+         xl: 1200px,
+         xxl: 1400px
+ );
 
 

@@ -3,126 +3,183 @@
     <modal v-if="showModal" :player=editingPlayer @handle-update-score="addScore" />
 
     <status-loading :loaded="isLoaded">
-<!--            <rough-svg-->
-<!--                width="100vw"-->
-<!--                height="300px"-->
-<!--            >-->
-<!--              <rough-rectangle-->
-<!--                  :x1="0"-->
-<!--                  :y1="0"-->
-<!--                  :x2="600"-->
-<!--                  :y2="200"-->
-<!--                  :fill="getCssVariable('&#45;&#45;primary-colour')"-->
-<!--                  :fill-style="'solid'"-->
-<!--                  :roughness="0.5"-->
-<!--                  :stroke="getCssVariable('&#45;&#45;secondary-colour')"-->
-<!--                  :stroke-width="3"-->
-<!--                  :hachureGap="5"-->
-<!--                  :bowing="5"-->
-<!--              />-->
-<!--            </rough-svg>-->
-
-
-<!--      <rough-bar-->
-<!--         :data="[-->
-<!--            {month:'Jan', Jaime:20, Molly: 5, Beans: 20},-->
-<!--            {month:'Feb', Jaime:25, Molly: 10, Beans: 30},-->
-<!--            {month:'Mar', Jaime:25, Molly: 10, Beans: 5},-->
-<!--          ]"-->
-<!--        :labels="'month'"-->
-<!--         :font="1"-->
-<!--         stroke="blue"-->
-<!--         colors="['black', 'blue', 'grey']"-->
-<!--      ></rough-bar>-->
-
-      <table v-cloak data-toggle="table"
-        data-search="true"
-        class="table table-hover mt-5"
-        id="boardsTable"
-      >
-      <thead class="header">
-        <tr>
-          <th class="text-left">
-            <span class="sr-only">Player</span>
-          </th>
-          <th class="text-center" v-for="(col, index) in periods" :key="index">
-            {{ period === "week" ? formatDate(col,"EEE") : null }}
-          </th>
-          <th class="text-center"> 
-            Week Total
-          </th>
-          <th class="text-center"> 
-            Overall Total
-          </th>
-          <th class="text-center">
-            <span class="sr-only">Add score</span>
-          </th> 
-        </tr>
-      </thead>
-      <tbody v-for="(player, key) in playerScores"
-             :key="key">
-        <tr :class="{'detail-view': detailedViewPlayerId===player.id}">
-          <td>
-              <div class="avatar-container">
-                <img src="../assets/arrow-green.svg" alt="arrow" class="arrow"/>
-                <span class="avatar">{{ player.name[0] }}</span>{{ player.name }}
-              </div>
-          </td>
-          
-          <td class="text-center" v-for="(score, index) in player.scores" key="index">
-            {{ score }}
-          </td>
-
-          <td class="text-center">
-            {{ player.periodTotal }}
-          </td>
-
-          <td class="text-center">
-            {{ player.overallTotal }}
-          </td>
-
-          <td class="text-center">
-            <div class="d-flex">
-              <button @click="editingPlayer=player; showModal=true"
-                class="btn btn-icon btn-primary ml-2" data-bs-toggle="tooltip"
-                data-placement="left" title="Add or edit score"
-              >
-                <font-awesome-icon icon="fas fa-plus fixed-width" />
+      <div v-cloak class="card main-card">
+        <div class="top-container d-flex flex-wrap">
+          <h1 contenteditable class="editable-cell board-name" role="textbox"
+              aria-label="player name"
+              @click="handleClickEditableContent($event)"
+              @blur="handleEditBoardName($event)"
+              @keyup.enter="handleEditBoardName($event)"
+          >
+            {{ board ? board.name : "" }}
+          </h1>
+          <div class="period-container d-flex align-items-center mb-1 ml-auto">
+            <h4 class="mb-0 period-text">
+                <span><strong>current week: </strong></span>
+                <span>{{
+                  formatDate(periodStart,"PP") + " - " +
+                  formatDate(periodEnd,"PP")
+                }}</span>
+            </h4>
+            <div class="btn-group ml-2">
+              <button class="btn btn-secondary btn-icon" @click="changePeriod('previous')">
+                <font-awesome-icon icon="fas fa-angle-left fixed-width" />
               </button>
-              <button @click="handleDetailedView(player)"
-                      class="btn btn-secondary btn-icon ml-2" data-bs-toggle="tooltip"
-                      data-placement="left" title="Show more information"
-              >
-                <font-awesome-icon icon="fas fa-angle-down fixed-width" />
+              <button class="btn btn-secondary btn-icon" @click="changePeriod('next')">
+                <font-awesome-icon icon="fas fa-angle-right fixed-width" />
               </button>
             </div>
-          </td>
-        </tr>
-        <tr v-if="detailedViewPlayerId===player.id" class="details">
-          <td colspan="100">
-            <div class="d-flex flex-row justify-content-between w-100">
-              <div class="card w-50 mr-2 ml-2">
-                <h3>statistics</h3>
-                <ul>
-                  <li>total period wins: 4</li>
-                  <li>total period wins: 4</li>
-                  <li>total period wins: 4</li>
-                  <li>total period wins: 4</li>
-                </ul>
-              </div>
-              <apexchart :ref="'chart_' + player.id"
-                         class="card score-chart w-50 mr-2 ml-2"
-                         width="100%" type="area" :options="chart.options" :series="chart.series" />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+        <table data-toggle="table"
+            data-search="true"
+            class="table table-borderless"
+            id="boardsTable"
+        >
+          <thead class="header">
+            <tr>
+              <th class="text-left">
+                <span class="sr-only">Player</span>
+              </th>
+              <th v-if="windowWidth >= getMediaBreakpoint('sm')" class="text-center align-middle align-middle" v-for="(col, index) in periods" :key="index">
+                {{ formatDate(col, setDateFormat()) }}
+              </th>
+              <th class="text-center align-middle total-cell total-week">
+                <div class="d-flex align-items-center">
+                  <div>
+                    Week<br>Total
+                  </div>
+                  <div class="sort-arrows d-flex flex-column ml-2 mb-3">
+                    <font-awesome-icon
+                        :class="{'sort-arrow': true, 'selected': sortCol === 'periodTotal' && sortDir === 'asc'}"
+                        icon="fa-solid fa-caret-up"
+                        aria-label="sort ascending"
+                        @click="sortColumn('periodTotal', 'asc')"
+                    />
+                    <font-awesome-icon
+                        :class="{'sort-arrow': true, 'selected': sortCol === 'periodTotal' && sortDir === 'desc'}"
+                        icon="fa-solid fa-caret-down"
+                        aria-label="sort descending"
+                        @click="sortColumn('periodTotal', 'desc')"
+                    />
+                  </div>
+                </div>
+              </th>
+              <th class="text-center align-middle total-cell total-overall">
+                <div class="d-flex align-items-center">
+                  <div>
+                    Overall<br>Total
+                  </div>
+                  <div class="sort-arrows d-flex flex-column ml-2 mb-3">
+<!--                    https://dribbble.com/shots/6827054-Data-website-Filters-sorting-data-table/attachments/6827054-Data-website-Filters-sorting-data-table?mode=media-->
+                    <font-awesome-icon
+                        :class="{'sort-arrow': true, 'selected': sortCol === 'overallTotal' && sortDir === 'asc'}"
+                        icon="fa-solid fa-caret-up"
+                        aria-label="sort ascending"
+                        @click="sortColumn('overallTotal', 'asc')"
+                    />
+                    <font-awesome-icon
+                        :class="{'sort-arrow': true, 'selected': sortCol === 'overallTotal' && sortDir === 'desc'}"
+                        icon="fa-solid fa-caret-down"
+                        aria-label="sort descending"
+                        @click="sortColumn('overallTotal', 'desc')"
+                    />
+                  </div>
+                </div>
+              </th>
+              <th class="text-center align-middle">
+                <span class="sr-only">Add score</span>
+              </th>
+            </tr>
+            <tr class="empty" aria-hidden="true">
+              <td colspan="100"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="(player, key) in playerScoresSorted" :key="key">
+              <tr :class="{'detail-view': detailedViewPlayer !== null && detailedViewPlayer.id===player.id}">
+                <td class="align-middle">
+                    <div class="avatar-container">
+                      <div class="avatar-container-inner">
+                        <!-- <img src="../assets/arrow-green-solid.svg" alt="arrow" class="arrow"/>-->
+                        <span class="avatar target player-name">{{ player.name[0] }}</span>
+                        <span contenteditable class="editable-cell player-name" role="textbox"
+                              aria-label="player name"
+                              @click="handleClickEditableContent($event)"
+                              @blur="handleEditPlayerName($event, player)"
+                              @keyup.enter="handleEditPlayerName($event, player)"
+                        >
+                          {{ player.name }}
+                        </span>
+                      </div>
+                    </div>
+                </td>
+
+                <td v-if="windowWidth >= getMediaBreakpoint('sm')" class="text-center align-middle score-cell"
+                    v-for="(score, index) in player.scores" key="index"
+                >
+                  <span contenteditable class="editable-cell score target"
+                        @click="handleClickEditableContent($event, !isFuture(new Date(score.date)))"
+                        @blur="!isFuture(score.date) ? handleEditScore($event, score) : null"
+                        @keyup.enter="!isFuture(score.date) ? handleEditScore($event, score) : null"
+                        @keydown="!isFuture(score.date) ? handleUpdateScore($event) : null"
+                  >
+                    {{ score.value }}
+                  </span>
+                </td>
+
+                <td class="text-center align-middle total-cell total-week">
+                  {{ player.periodTotal }}
+                </td>
+
+                <td class="text-center align-middle total-cell total-overall">
+                  {{ player.overallTotal }}
+                </td>
+
+                <td class="text-center align-middle">
+                  <div class="d-flex edit-btn-container">
+                    <button @click="editingPlayer=player; showModal=true"
+                      class="btn btn-icon btn-table btn-primary" data-bs-toggle="tooltip"
+                      data-placement="left" title="Add or edit score"
+                    >
+                      <font-awesome-icon icon="fas fa-plus fixed-width" />
+                    </button>
+                    <button @click="handleDetailedView(player)"
+                            class="btn btn-secondary btn-icon btn-table" data-bs-toggle="tooltip"
+                            data-placement="left" title="Show more information"
+                    >
+                      <font-awesome-icon icon="fas fa-angle-down fixed-width" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="detailedViewPlayer && detailedViewPlayer.id===player.id" class="details">
+                <td colspan="100" class="details-cell">
+                  <div class="d-flex flex-row justify-content-between w-100 mb-3">
+                    <div class="card chart-average">
+                      <h3>average performance</h3>
+                      <apexchart :ref="'avgScoreChart_' + player.id" width="100%" type="bar"
+                                 :options="avgScoreChart.options" :series="avgScoreChart.series" />
+                    </div>
+                    <div class="card chart-period">
+                      <h3>this weeks performance</h3>
+                      <apexchart :ref="'periodChart_' + player.id" width="100%" type="area"
+                                 :options="periodChart.options" :series="periodChart.series" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="detailedViewPlayer && detailedViewPlayer.id===player.id" class="empty" aria-hidden="true">
+                <td colspan="100"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
     </status-loading>
 
-    <div class="d-flex mb-2 mt-5">
-      <input type="text" id="userName" aria-label="New Player Name" placeholder="Player Name" class="form-control">
-<!--      <rough-button @click="addPlayer()" class="ml-2" btn-text="Add Player" />-->
+    <div class="d-flex mb-5 mt-5">
+      <input type="text" id="newPlayerName" aria-label="New Player Name" placeholder="Player Name" class="form-control">
       <button @click="addPlayer()" class="btn btn-primary ml-2">Add Player</button>
     </div>
   </div>
@@ -134,57 +191,111 @@ import UserDataService from "../services/UserDataService.js";
 import PlayerDataService from "../services/PlayerDataService.js";
 import ScoreDataService from "../services/ScoreDataService.js";
 import Modal from "./Modal.vue"
-import { format as formatDate, startOfWeek, endOfWeek, eachDayOfInterval, isEqual } from 'date-fns'
+import {
+  format as formatDate,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isEqual,
+  addWeeks,
+  subWeeks,
+  isFuture
+} from 'date-fns'
 import StatusLoading from "./StatusLoading.vue"
-import RoughButton from "./elements/RoughButton.vue"
-
-// import {RoughLine, RoughSvg, RoughCanvas, RoughRectangle} from "./rough";
-// import { DoughnutChart } from 'vue-chart-3';
-// import { Chart, registerables } from "chart.js";
-// Chart.register(...registerables);
-
-// import RoughBar from "./rough/RoughBar.vue"
+import { getMediaBreakpoint } from "../utils.js"
+import BoardDataService from "../services/BoardDataService";
+import {round} from "lodash";
 
 export default {
   components: {
-    // RoughBar,
     Modal,
     StatusLoading,
-    RoughButton,
-    // RoughLine,
-    // RoughSvg,
-    // RoughRectangle,
-    // DoughnutChart,
   },
   name: "ScoreBoard",
-  props: {
-    id: String
-  },
   data() {
     return {
-      // testData: {
-      //   labels: ['Paris', 'Nîmes', 'Toulon', 'Perpignan', 'Autre'],
-      //   datasets: [
-      //     {
-      //       data: [30, 40, 60, 70, 5],
-      //       backgroundColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
-      //     },
-      //   ],
-      // },
       showModal: false,
       editingPlayer: null,
-      detailedViewPlayerId: null,
+      detailedViewPlayer: null,
       boardId: null,
+      board: null,
       playerId: null,
       scores: [],
       players: [],
       period: "week",
+      currentPeriod: new Date(),
+      dateFormat: "EEE",
+      minScore: 0,
+      maxScore: 6,
       isLoaded: false,
-      chart: {
+      windowWidth: window.innerWidth,
+      avgScoreChart: {
+        options: {
+          chart: {
+            type: 'bar',
+            id: 'avg-chart-period',
+            sparkline: {
+              enabled: false,
+            },
+            colors: [this.primaryColour, this.secondaryColour],
+            toolbar: {
+              show: false
+            }
+          },
+          dataLabels: {
+            enabled: true,
+            style: {
+              fontSize: "1rem",
+            }
+          },
+          xaxis: {
+            categories: ["average scores"],
+            labels: {
+              show: false,
+            },
+          },
+          yaxis: {
+            show: false
+          },
+          grid: {
+            show: false,
+          },
+          zoom: {
+            enabled: false
+          },
+          legend: {
+            show: true,
+            fontSize: '16px',
+          },
+          title: {
+            show: false,
+          },
+          fill: {
+            opacity: 1,
+          },
+          tooltip: {
+            style: {
+              fontSize: '0.8rem',
+            }
+          },
+          plotOptions: {
+            bar: {
+              borderRadius: 5,
+            },
+            dataLabels: {
+              total: {
+                enabled: false,
+              }
+            }
+          },
+        },
+        series: []
+      },
+      periodChart: {
         options: {
           chart: {
             type: 'area',
-            id: 'score-chart',
+            id: 'score-period-chart',
             stroke: {
               curve: 'smooth'
             },
@@ -193,12 +304,6 @@ export default {
             },
             sparkline: {
               enabled: true,
-            },
-            zoom: {
-              enabled: false
-            },
-            legend: {
-              show: false,
             },
             colors: []
           },
@@ -209,46 +314,50 @@ export default {
             min: 0,
             max: 7,
             floating: false,
-
           },
           dataLabels: {
             enabled: false,
-          }
+          },
+          tooltip: {
+            style: {
+              fontSize: '0.8rem',
+            }
+          },
         },
         series: [{
           name: '',
           data: []
         }]
       },
-      playerChart: {}
+      playerChart: {},
+      sortCol: "periodTotal",
+      sortDir: "desc"
     };
   },
   sockets: {
     scoreAdded() {
-      console.log("scoreAdded")
       this.getScores();
     },
     playerAdded() {
-      console.log("playerAdded")
-      this.getPlayers();
+      this.getPlayers()
     },
   },
   computed: {
-    windowWidth() {
-      return window.innerWidth;
+    //TODO: accommodate other periods (i.e. months)
+    periodStart() {
+      return startOfWeek(this.currentPeriod, {weekStartsOn: 1});
+    },
+    periodEnd() {
+      return endOfWeek(this.currentPeriod, { weekStartsOn: 1 });
     },
     periods() {
-      const today = new Date()
-      const startDate = startOfWeek(today, {weekStartsOn: 1});
-      const endDate = endOfWeek(today, { weekStartsOn: 1 });
-      return eachDayOfInterval({ start: startDate, end: endDate });
+      return eachDayOfInterval({ start: this.periodStart, end: this.periodEnd });
     },
     periodsReformatted() {
-      return this.periods.map((period) => formatDate(period,'EEE'))
+      return this.periods.map((period) => formatDate(period,'EEEE').toLowerCase())
     },
     playerScores() {
       let playerScores = [];
-      let playerSeries = [];
       let reformatPeriod = [];
       this.players.forEach(player => {
         //get overall total
@@ -266,23 +375,19 @@ export default {
           categories: []
         }
         this.periods.forEach(period => {
-          reformatPeriod.push(formatDate(period, "EEE"));
+          reformatPeriod.push(this.formatDate(period, this.setDateFormat()));
           let score = allScores.filter(score => {
             const scoreDate = new Date(score.date);
             scoreDate.setHours(0, 0, 0, 0);
             return isEqual(scoreDate, period);
           })
           periodTotal = periodTotal + (score.length ? score[0].score : 0);
-          periodScores[period] = score.length ? score[0].score : ""
+          periodScores[period] = {
+            value: score.length ? score[0].score : "",
+            id: score.length ? score[0].id : "",
+            date: period
+          }
           this.playerChart[player.id].series.push(score.length ? score[0].score : 0);
-          // this.playerChart[player.id].categories.push(formatDate(period, "EEE"))
-          // this.playerChart[player.id].categories.push(period);
-
-        })
-
-        playerSeries.push({
-          name: player.name,
-          data: this.playerChart[player.id].series
         })
 
         let playerObj = {};
@@ -291,66 +396,83 @@ export default {
         )
       })
 
-      const chartColours = [];
-      const secondaryColour = this.getCssVariable('--secondary-colour');
-      const primaryColour = this.getCssVariable('--primary-colour');
-      this.players.forEach((player) => {
-        if (player.id !== this.detailedViewPlayerId) {
-          chartColours.push(secondaryColour);
-        } else {
-          chartColours.push(primaryColour);
-        }
-      })
-
-      if (this.detailedViewPlayerId) {
-        const chartRef = 'chart_' + this.detailedViewPlayerId
-        if (!this.$refs[chartRef]) {
-          //initial chart rendering
-          const options = this.chart.options;
-          options.xaxis.categories = this.periodsReformatted;
-          options.legend = {show: false};
-          options.colors = chartColours;
-          this.chart.series = playerSeries;
-        } else {
-          //updates to chart
-          this.$refs[chartRef].updateSeries(playerSeries)
-          this.$refs[chartRef].chart.updateOptions({
-            xaxis: {
-              categories: this.periodsReformatted,
-            },
-            colors: chartColours
+      //TODO: move this to another computed variable
+      //chart rendering
+      if (this.detailedViewPlayer) {
+        //period performance
+        let playerSeries = [];
+        const periodChartColours = [];
+        this.players.forEach((player) => {
+          playerSeries.push({
+            name: player.name,
+            data: this.playerChart[player.id].series
           })
-        }
-      }
+          if (player.id !== this.detailedViewPlayer.id) {
+            periodChartColours.push(this.secondaryColour);
+          } else {
+            periodChartColours.push(this.primaryColour);
+          }
+        })
 
+        this.periodChart.series = playerSeries;
+        let options = this.periodChart.options;
+        options.xaxis.categories = this.periodsReformatted;
+        options.colors = periodChartColours;
+
+        //average scores
+        const detailedPlayerScores = this.scores.filter(score => score.playerId === this.detailedViewPlayer.id)
+        const playerSumScores = detailedPlayerScores.reduce((prev, curr) => {
+          return prev + (isNaN(curr.score) ? 0 : parseInt(curr.score))
+        }, 0);
+        const playerAvgScores = round((playerSumScores / detailedPlayerScores.length)) || 0;
+        const boardSumScores = this.scores.reduce((prev, curr) => {
+          return prev + (isNaN(curr.score) ? 0 : parseInt(curr.score))
+        }, 0);
+        const boardAvgScores = round((boardSumScores / this.scores.length)) || 0;
+
+        this.avgScoreChart.series = [
+          {name: this.detailedViewPlayer.name, data: [playerAvgScores]},
+          {name: 'board', data: [boardAvgScores]}
+        ]
+        this.avgScoreChart.options.colors = [this.primaryColour, this.secondaryColour];
+      }
 
       return playerScores;
     },
+    playerScoresSorted() {
+      return this.playerScores.sort((a,b) => {
+        let modifier = 1;
+        if (this.sortDir === 'desc') {
+          modifier = -1;
+        }
+        if (a[this.sortCol] < b[this.sortCol]) return -1 * modifier;
+        if (a[this.sortCol] > b[this.sortCol]) return 1 * modifier;
+        return 0;
+      });
+    },
+    primaryColour() {
+      return '#3eb489';
+      // return this.getCssVariable('--primary-colour'); //chart colour not right in chrome
+    },
+    secondaryColour() {
+      return '#4f4f4f';
+      // return this.getCssVariable('--secondary-colour');
+    }
   },
   mounted() {
-    // this.isLoaded = false;
-    // let tooltipTriggerList = [].slice.call(
-    //   document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    // );
-    // const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    //     return new Tooltip(tooltipTriggerEl);
-    // });
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
   },
   async created() {
-    if (!this.id) {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const boardId = urlParams.get('board');
-      
-      if (boardId) {
-        this.boardId = boardId;
-      } else {
-        //TODO: friendly error, board not found
-      }
+    const boardId = this.$route.params.id;
+    if (boardId) {
+      this.boardId = boardId;
     } else {
-      this.boardId = this.id;
+      //TODO: friendly error, board not found
     }
     this.$socket.emit("joinBoard", this.boardId)
+    this.getBoard();
     this.getPlayers();
     this.getScores();
   },
@@ -359,96 +481,95 @@ export default {
       console.log("Loaded", newVal);
     }
   },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.onResize);
+  },
   methods: {
+    getMediaBreakpoint: getMediaBreakpoint,
+    formatDate: formatDate, //https://date-fns.org/v2.29.3/docs/format
+    startOfWeek: startOfWeek,
+    endOfWeek: endOfWeek,
+    isFuture: isFuture,
+    changePeriod(direction) {
+      //TODO: update when support months or other periods (see add/sub fns for more flexibility: https://date-fns.org/v2.29.3/docs/add)
+      if (direction === "next") {
+        this.currentPeriod = addWeeks(this.currentPeriod, 1);
+      } else if (direction === "previous") {
+        this.currentPeriod = subWeeks(this.currentPeriod, 1);
+      }
+    },
+    sortColumn(column, direction) {
+      //if column == current sort, reverse
+      if (column === this.sortCol) {
+        this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+      }
+      this.sortCol = column;
+    },
+    onResize() {
+      this.windowWidth = window.innerWidth;
+      //detect top header wrap
+      const periodContainer = document.querySelector(".period-container");
+      const periodTop = periodContainer.getBoundingClientRect().top;
+      const headerTop = document.querySelector("h1").getBoundingClientRect().top;
+      if (periodTop !== headerTop) {
+        periodContainer.classList.remove("ml-auto");
+      } else {
+        periodContainer.classList.add("ml-auto");
+      }
+    },
     getCssVariable(name) {
       return getComputedStyle(document.documentElement).getPropertyValue(name);
     },
-    lightenHexColour(col, position) {
-      const numPlayers = this.players.length;
-      const amt = (200 / numPlayers) * position;
-      const num = parseInt(col,16);
-
-      let usePound = false;
-      if (col[0] === "#") {
-        col = col.slice(1);
-        usePound = true;
-      }
-
-      //red
-      let r = (num >> 16) + amt;
-      if (r > 255) {
-        r = 255;
-      } else if(r < 0) {
-        r = 0;
-      }
-
-      //green
-      let g = (num & 0x0000FF) + amt;
-      if (g > 255) {
-        g = 255;
-      } else if(g < 0) {
-        g = 0;
-      }
-
-      //blue
-      let b = ((num >> 8) & 0x00FF) + amt;
-      if (b > 255) {
-        b = 255;
-      } else if(b < 0) {
-        b = 0;
-      }
-
-      return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
-    },
     addPlayer() {
-      const nameInput = document.getElementById("userName");
+      this.isLoaded = false;
+      const nameInput = document.getElementById("newPlayerName");
 
       if (!nameInput.value.length) {
+        this.isLoaded = true;
         return alert("error");
       }
 
       const data = {
         name: nameInput.value,
-        boardId: this.id,
+        boardId: this.boardId,
         userId: null //TODO
       };
 
       PlayerDataService.create(data)
-        .then(response => {
-          const playerId = response.data.id;
-          console.log("playerID", response.data);
-          this.playerId = playerId;
-          // this.goToPlayer(playerId);
-          this.$socket.emit("playerAdded", playerId, this.boardId);
-        })
-        .catch(e => {
-          console.log(e);
-        });
+          .then(response => {
+            const playerId = response.data.id;
+            this.playerId = playerId;
+            // this.goToPlayer(playerId);
+            this.$socket.emit("playerAdded", playerId, this.boardId);
+            nameInput.value = null;
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      this.isLoaded = true;
     },
     goToPlayer(playerId) {
-      this.$router.push({ path: `${this.boardId}/player/${playerId}` })
+      this.$router.push({path: `${this.boardId}/player/${playerId}`})
     },
     addScore(score = null, date = null) {
       if (score !== null && date !== null) {
-        console.log("player",this.editingPlayer)
         //update score
         const data = {
           score: parseInt(score),
           playerId: this.editingPlayer.id,
-          boardId: this.id,
+          boardId: this.boardId,
           date: new Date(date)
           // date: new Date().toISOString().slice(0, 10)
         };
 
         ScoreDataService.create(data)
-          .then(response => {
-            const scoreId = response.data.id;
-            console.log("scoreId", response.data);
-            this.$socket.emit("scoreAdded", scoreId, this.editingPlayer, this.boardId);
-          })
-          .catch(e => {
-            console.log(e);
-          });
+            .then(response => {
+              const scoreId = response.data.id;
+              this.$socket.emit("scoreAdded", scoreId, this.editingPlayer, this.boardId);
+            })
+            .catch(e => {
+              console.log(e);
+            });
       }
 
       this.showModal = false;
@@ -456,51 +577,227 @@ export default {
     },
     getScores() {
       this.isLoaded = false;
-      console.log(false);
       ScoreDataService.getAllByBoard(this.boardId)
-        .then(response => {
-          const scoreId = response.data.id;
-          console.log("scores", response.data);
-          this.scores = response.data;
-        })
-        .catch(e => {
-          console.log(e);
-        });
-      console.log(true);
-      setTimeout(()=>{
-        this.isLoaded = true;
-      },1000)
-
+          .then(response => {
+            const scoreId = response.data.id;
+            // console.log("scores", response.data);
+            this.scores = response.data;
+            this.$nextTick(() => {
+              this.isLoaded = true;
+            })
+          })
+          .catch(e => {
+            this.isLoaded = true;
+            console.log(e);
+          });
+    },
+    getBoard() {
+      BoardDataService.get(this.boardId)
+          .then(response => {
+            this.board = response.data;
+            // const players = response.data.players;
+            // console.log("PLAYERS", players)
+            // players.forEach(player => {
+            //   this.getPlayer(player.playerId);
+            // })
+          })
+          .catch(e => {
+            console.log(e);
+          });
     },
     getPlayers() {
-      this.isLoaded = false;
       PlayerDataService.getAllByBoard(this.boardId)
+          .then(response => {
+            this.players = response.data;
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+    getPlayer(playerId) {
+      PlayerDataService.get(playerId)
         .then(response => {
-          console.log("players", response.data);
-          this.players = response.data;
+          console.log("player", response.data);
+          this.players.push(response.data);
         })
         .catch(e => {
           console.log(e);
         });
-      this.isLoaded = false;
     },
     handleDetailedView(player) {
       this.editingPlayer = player;
-      if (this.detailedViewPlayerId === player.id) {
+      if (this.detailedViewPlayer && this.detailedViewPlayer.id === player.id) {
         //toggle off
-        this.detailedViewPlayerId = null;
+        this.detailedViewPlayer = null;
       } else {
-        this.detailedViewPlayerId = player.id;
+        this.detailedViewPlayer = player;
+
+        // //period performance
+        // let playerSeries = [];
+        // const periodChartColours = [];
+        // this.players.forEach((player) => {
+        //   playerSeries.push({
+        //     name: player.name,
+        //     data: this.playerChart[player.id].series
+        //   })
+        //   if (player.id !== this.detailedViewPlayer.id) {
+        //     periodChartColours.push(this.secondaryColour);
+        //   } else {
+        //     periodChartColours.push(this.primaryColour);
+        //   }
+        // })
+        //
+        // this.periodChart.series = playerSeries;
+        // let options = this.periodChart.options;
+        // options.xaxis.categories = this.periodsReformatted;
+        // options.colors = periodChartColours;
+        //
+        // //average scores
+        // const detailedPlayerScores = this.scores.filter(score => score.playerId === this.detailedViewPlayer.id)
+        // const playerSumScores = detailedPlayerScores.reduce((prev, curr) => {
+        //   return prev + (isNaN(curr.score) ? 0 : parseInt(curr.score))
+        // }, 0);
+        // const playerAvgScores = round((playerSumScores / detailedPlayerScores.length)) || 0;
+        // const boardSumScores = this.scores.reduce((prev, curr) => {
+        //   return prev + (isNaN(curr.score) ? 0 : parseInt(curr.score))
+        // }, 0);
+        // const boardAvgScores = round((boardSumScores / this.scores.length)) || 0;
+        //
+        // this.avgScoreChart.series = [
+        //   { name: this.detailedViewPlayer.name, data: [playerAvgScores] },
+        //   { name: 'board',data: [boardAvgScores] }
+        // ]
+        // this.avgScoreChart.options.colors = [this.primaryColour, this.secondaryColour];
       }
     },
-    formatDate(date, format) {
-      //workaround to use format function in template
-      return formatDate(date, format)
+    setDateFormat() {
+      //https://date-fns.org/v2.29.3/docs/format
+      //TODO: update once other period types available
+      if (this.windowWidth <= getMediaBreakpoint("md")) {
+        this.dateFormat = "EEEEE";
+      } else if (this.windowWidth <= getMediaBreakpoint("lg")) {
+        this.dateFormat = "EEEEEE";
+      } else {
+        this.dateFormat = "EEE";
+      }
+      return this.dateFormat;
     },
+    handleClickEditableContent(event, allow = true) {
+      if (allow) {
+        event.target.classList.add('form-control');
+      } else {
+        alert("Sorry, you can't add scores for future dates.")
+      }
+    },
+    handleUpdateEditableContent(event) {
+      event.preventDefault();
+      event.target.classList.remove('form-control');
+    },
+    handleEditBoardName(event) {
+      this.handleUpdateEditableContent(event);
+
+      const updatedName = event.target.innerText.trim();
+      //TODO: handle empty
+      if (updatedName.length && updatedName !== this.board.name) {
+        BoardDataService.update(this.boardId, {name: `${updatedName}`})
+            .then(response => {
+              this.$socket.emit("boardUpdated", this.playerId, this.boardId);
+            })
+            .catch(e => {
+              console.log(e);
+            });
+      }
+
+      //ensure it's trimmed and no HTML
+      event.target.innerHTML = updatedName;
+    },
+    handleEditPlayerName(event, player) {
+      this.handleUpdateEditableContent(event);
+
+      const updatedName = event.target.innerText.trim();
+      //TODO: handle empty
+      if (updatedName.length && updatedName !== player.name) {
+        PlayerDataService.update(player.id, {name: `${updatedName}`})
+            .then(response => {
+              this.$socket.emit("playerUpdated", player.id, this.boardId);
+            })
+            .catch(e => {
+              console.log(e);
+            });
+      }
+
+      //ensure it's trimmed and no HTML
+      event.target.innerHTML = updatedName;
+    },
+    handleUpdateScore(event) {
+      //TODO: add config to allow/disallow decimals: event.code === 'Period'
+        if (!(event.code.includes('Digit') || event.code.includes('Numpad') || event.code === 'Backspace'
+            || event.code === 'ArrowLeft' || event.code === 'ArrowRight' || event.code === 'Delete')) {
+
+          event.preventDefault()
+        }
+    },
+    handleEditScore(event, score) {
+      this.handleUpdateEditableContent(event);
+
+      const updatedScore = event.target.innerText.trim();
+      //TODO: handle empty, non number
+
+      //add new score
+      //TODO: handle new score added
+
+      //update existing score
+      if (updatedScore !== "" && updatedScore !== null && !Number.isNaN(updatedScore) && parseInt(updatedScore) !== parseInt(score.value)) {
+        ScoreDataService.update(score.id, {score: `${parseInt(updatedScore)}`})
+            .then(response => {
+              const scoreId = response.data.id;
+              this.$socket.emit("scoreAdded", scoreId, this.editingPlayer, this.boardId);
+            })
+            .catch(e => {
+              console.log(e);
+            });
+      }
+
+      //ensure it's trimmed and no HTML
+      event.target.innerHTML = updatedScore;
+    }
   },
 }
 </script>
 
 <style lang="scss">
+
+  .edit-btn-container {
+    button.btn:first-child {
+      margin-right: .5rem;
+
+      @include media-breakpoint-down(sm) {
+        margin-right: .3rem;
+      }
+    }
+
+  }
+
+   //@include media-breakpoint-down("xs") {
+   //  .edit-btn-container {
+   //    flex-wrap: wrap;
+   //    width: 50px;
+   //     & > .btn-primary {
+   //       margin-bottom: 3px;
+   //     }
+   //  }
+   //}
+
+   //.total-cell {
+   //  background-color: var(--primary-colour-light5);
+   //}
+
+   //.total-week {
+   //  border-left: solid 3px var(--secondary-colour) !important;
+   //}
+   //
+   //.total-overall {
+   //  border-right: solid 3px var(--secondary-colour) !important;
+   //}
 
 </style>

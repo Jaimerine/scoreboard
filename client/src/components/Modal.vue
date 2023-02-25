@@ -1,10 +1,10 @@
 <template>
   <div class="modal-container">
-    <div class="modal">
+    <div class="modal-custom">
       <div class="modal-content">
         <div class="modal-header">
           <div>
-            <h4>{{ player.name + (player.name[player.name.length - 1].toLowerCase() === "s" ? "' score" : "'s score")}}</h4>
+            <h2>{{ player.name + (player.name[player.name.length - 1].toLowerCase() === "s" ? "' score" : "'s score")}}</h2>
           </div>
           <button class="btn-close" @click="closeModal(false)" aria-label="close">
             <font-awesome-icon icon="fas fa-times" aria-hidden="true"/>
@@ -13,8 +13,8 @@
         <div class="modal-body">
 
           <!-- date -->
-          <div class="d-flex align-items-start">
-            <p>Date:</p>
+          <div class="d-flex align-items-center">
+            <h3>Date:</h3>
             <DatePicker v-model="date" mode="date" color="blue" trim-weeks :max-date="new Date()">
               <template v-slot="{ inputValue, inputEvents }">
 
@@ -36,8 +36,8 @@
           </div>
 
           <!-- score -->
-          <div class="d-flex align-items-start">
-            <p>Score:</p>
+          <div class="d-flex align-items-center">
+            <h3>Score:</h3>
             <div class="input-group ml-2">
               <span id="scoreGroup" class="input-group-text">
                 <font-awesome-icon icon="fas fa-hashtag" />
@@ -142,18 +142,24 @@ export default {
         animation: scaleDown .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
       }
     }
+
+    &.modal-custom {
+      width: max-content;
+      max-width: 600px;
+      padding: 10px;
+      display: inline;
+      opacity: 0;
+      animation: scaleUp .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      margin: 15px;
+    }
   }
-  .modal {
-    width: max-content;
-    max-width: 600px;
-    height: 80%;
-    padding: 10px;
-    position: sticky;
-    display: inline;
-    opacity: 0;
-    animation: scaleUp .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
-  }
+
+
   .modal-header {
+    h3 {
+      text-transform: none !important;
+    }
+
     .btn-close {
       font-size: 1.2rem;
       transition: color .2s, transform .3s;

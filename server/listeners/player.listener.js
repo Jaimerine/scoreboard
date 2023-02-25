@@ -9,6 +9,12 @@ const playerHandler = (io, socket) => {
     }
   })
 
+  //player edited
+  socket.on("playerUpdated", (playerId) => {
+    if (boardId) {
+      io.to(boardId).emit("playerUpdated: " + playerId);
+    }
+  })
 }
 
 export default playerHandler;

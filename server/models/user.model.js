@@ -1,5 +1,5 @@
 const user = (mongoose) => {
-  var schema = mongoose.Schema(
+  const schema = mongoose.Schema(
     {
       name: String
     },
@@ -10,8 +10,8 @@ const user = (mongoose) => {
     object.id = _id;
     return object;
   });
-  const User = mongoose.model("user", schema, "user");
-  return User;
+
+  return mongoose.model("user", schema, "user");
 };
 
 export default user;

@@ -1,5 +1,5 @@
 const score = (mongoose) => {
-  var schema = mongoose.Schema(
+  const schema = mongoose.Schema(
     {
       playerId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -19,8 +19,8 @@ const score = (mongoose) => {
     object.id = _id;
     return object;
   });
-  const Score = mongoose.model("score", schema, "score");
-  return Score;
+
+  return mongoose.model("score", schema, "score");
 };
 
 export default score;

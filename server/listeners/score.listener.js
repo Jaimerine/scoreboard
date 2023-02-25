@@ -9,6 +9,13 @@ const scoreHandler = (io, socket) => {
     }
   })
 
+  //player edited
+  socket.on("scoreUpdated", (scoreId) => {
+    if (boardId) {
+      io.to(boardId).emit("scoreAdded");
+    }
+  })
+
 }
 
 export default scoreHandler;

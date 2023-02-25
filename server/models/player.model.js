@@ -1,5 +1,5 @@
 const player = (mongoose) => {
-  var schema = mongoose.Schema(
+  const schema = mongoose.Schema(
     {
       name: String,
       userId:
@@ -7,6 +7,12 @@ const player = (mongoose) => {
           type: mongoose.Schema.Types.ObjectId,
           ref: "user",
         },
+      boardId:
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "board",
+        },
+
     },
     { timestamps: true }
   );
@@ -15,8 +21,8 @@ const player = (mongoose) => {
     object.id = _id;
     return object;
   });
-  const Player = mongoose.model("player", schema, "player");
-  return Player;
+
+  return mongoose.model("player", schema, "player");
 };
 
 export default player;

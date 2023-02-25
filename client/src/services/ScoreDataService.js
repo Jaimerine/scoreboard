@@ -11,7 +11,7 @@ class ScoreDataService {
     return http.post("/scores/", data);
   }
   update(id, data) {
-    return http.put(`/scores/${id}`, data);
+    return http.patch(`/scores/${id}`, data);
   }
   delete(id) {
     return http.delete(`/scores/${id}`);

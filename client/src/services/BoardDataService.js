@@ -11,7 +11,7 @@ class BoardDataService {
     return http.post("/boards/", data);
   }
   update(id, data) {
-    return http.put(`/boards/${id}`, data);
+    return http.patch(`/boards/${id}`, data);
   }
   delete(id) {
     return http.delete(`/boards/${id}`);
@@ -19,8 +19,6 @@ class BoardDataService {
   deleteAll() {
     return http.delete(`/boards`);
   }
-  findByTitle(title) {
-    return http.get(`/boards?title=${title}`);
-  }
+
 }
 export default new BoardDataService();
