@@ -218,15 +218,20 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 50%;
       padding: .9rem;
       transition: none;
       &:hover {
         transform: scale(1.05);
       }
 
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(lg) {
         font-size: .9rem !important;
+      }
+
+      @include media-breakpoint-down(sm) {
+        width: 1.2rem;
+        height: 1.2rem;
+        padding: 0.75rem;
       }
     }
   }
@@ -236,10 +241,19 @@ export default {
      @include media-breakpoint-up(xxl) {
        max-width: 1200px;
      }
-     @include media-breakpoint-down(md) {
+     @include media-breakpoint-down(xl) {
        max-width: 95vw;
      }
-     @include media-breakpoint-down(sm) {
+     @include media-breakpoint-down(md) {
+       max-width: 100vw;
+     }
+     @include media-breakpoint-down(xs) {
+       max-width: 90vw;
+     }
+     @include media-breakpoint-down(xxs) {
+       max-width: 95vw;
+     }
+     @include media-breakpoint-down(xxs) {
        max-width: 100vw;
      }
    }
@@ -278,7 +292,7 @@ export default {
   #main {
     margin-top: -70px !important;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(lg) {
       padding-right: 0;
       padding-left: 0;
     }
@@ -292,12 +306,12 @@ export default {
     &.main-card {
       border: 5px solid var(--secondary-colour);
 
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(lg) {
         padding: .5rem;
       }
     }
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(lg) {
       padding: .5rem;
     }
   }
@@ -325,12 +339,15 @@ export default {
 
   //tables
   table.table {
+    width: 100%;
+    table-layout: fixed;
+
     td, th {
       padding: 0.5rem;
 
-      @include media-breakpoint-down(xs) {
-        padding: 0.2rem;
-      }
+      //@include media-breakpoint-down(xs) {
+      //  padding: 0.2rem;
+      //}
     }
 
     thead th {
@@ -338,8 +355,55 @@ export default {
       line-height: 1.2;
       border-bottom: solid 3px var(--primary);
 
+      @include media-breakpoint-down(md) {
+        font-size: 1.3rem;
+      }
+
       @include media-breakpoint-down(xs) {
         font-size: 1.2rem;
+      }
+
+      &.header-player {
+        width: 30%;
+
+        @include media-breakpoint-down(sm) {
+          width: 28%;
+        }
+        @include media-breakpoint-down(xs) {
+          width: 46%;
+        }
+      }
+
+      &.header-period {
+        width: 6%; //* 7
+        white-space: nowrap;
+
+        @include media-breakpoint-down(sm) {
+          width: 7.5%;
+        }
+      }
+
+      &.header-total {
+        width: 9%; //* 2
+        white-space: nowrap;
+
+        @include media-breakpoint-down(xs) {
+          width: 18%;
+        }
+
+        &.total-week > div {
+          @include media-breakpoint-down(xxs) {
+            margin-left: -0.3rem;; //prevent overlap
+          }
+        }
+      }
+
+      &.header-extra {
+        width: 12%;
+
+        @include media-breakpoint-down(xs) {
+          width: 18%;
+        }
       }
     }
 
@@ -366,7 +430,17 @@ export default {
         border-bottom: solid 3px transparent;
         padding: 10px;
 
-        @include media-breakpoint-down(sm) {
+        &.details-cell > div {
+          @include media-breakpoint-down(xs) {
+            flex-wrap: wrap;
+
+            & div.card.chart-average, div.card.chart-period {
+                margin: 0.3rem;
+            }
+          }
+        }
+
+        @include media-breakpoint-down(lg) {
           padding: 3px;
         }
 
@@ -454,20 +528,20 @@ export default {
     outline: solid 3px var(--secondary-colour);
     outline-offset: 6px;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(lg) {
       &.avatar {
-        margin: 6px 12px 6px 6px;
+        margin: 8px 12px 8px 8px
       }
       height: 2rem;
       width: 2rem;
       outline-offset: 4px;
     }
 
-    @include media-breakpoint-down(xs) {
-      height: 1.6rem;
-      width: 1.6rem;
-      outline-offset: 3px;
-    }
+    //@include media-breakpoint-down(xs) {
+    //  height: 1.6rem;
+    //  width: 1.6rem;
+    //  outline-offset: 3px;
+    //}
 
     &.score {
       margin: 0 2px;
@@ -503,16 +577,6 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: 300px;
-    min-width: 150px;
-
-    @include media-breakpoint-down(sm) {
-      max-width: 150px;
-    }
-
-    @include media-breakpoint-down(xs) {
-      max-width: 150px;
-    }
   }
 
   #app {
@@ -527,13 +591,17 @@ export default {
       border-radius: 1.2rem;
     }
 
+    .form-control {
+      border: 2px solid var(--primary);
+    }
+
     h1 {
       font-size: 2.5rem;
 
-      @include media-breakpoint-down(md) {
+      @include media-breakpoint-down(lg) {
         font-size: 2rem !important;
       }
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(lg) {
         font-size: 1.8rem !important;
       }
     }
@@ -545,20 +613,20 @@ export default {
     h2 {
         font-size: 2rem;
 
-      @include media-breakpoint-down(md) {
+      @include media-breakpoint-down(lg) {
         font-size: 1.8rem !important;
       }
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(lg) {
         font-size: 1.6rem !important;
       }
     }
 
     h3 {
         font-size: 1.5rem;
-      @include media-breakpoint-down(md) {
+      @include media-breakpoint-down(lg) {
         font-size: 1.4rem !important;
       }
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(lg) {
         font-size: 1.3rem !important;
       }
     }

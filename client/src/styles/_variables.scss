@@ -30,11 +30,12 @@ $font-color: #4f4f4f;
 
 //media breakpoints
  $grid-breakpoints: (
-         xxs: 0,
-         xs: 425px,
+         xxxs: 0,
+         xxs: 350px,
+         xs: 450px,
          sm: 600px,
-         md: 774px,
-         lg: 900px,
+         md: 785px,
+         lg: 925px,
          xl: 1200px,
          xxl: 1400px
  );

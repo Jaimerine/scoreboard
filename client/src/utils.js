@@ -8,14 +8,16 @@ const randomNumber = (max) => {
 
 export function getMediaBreakpoint(size) {
   switch (size) {
+    case "xxs":
+      return 450;
     case "xs":
-      return 425;
+      return 450;
     case "sm":
       return 600;
     case "md":
-      return 774;
+      return 785;
     case "lg":
-      return 900;
+      return 925;
     case "xl":
       return 1200;
     case "xxl":

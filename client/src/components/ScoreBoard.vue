@@ -38,18 +38,22 @@
         >
           <thead class="header">
             <tr>
-              <th class="text-left">
+              <th class="text-left header-player">
                 <span class="sr-only">Player</span>
               </th>
-              <th v-if="windowWidth >= getMediaBreakpoint('sm')" class="text-center align-middle align-middle" v-for="(col, index) in periods" :key="index">
+              <th v-if="windowWidth >= getMediaBreakpoint('sm')"
+                  class="text-center align-middle align-middle header-period"
+                  v-for="(col, index) in periods"
+                  :key="index"
+              >
                 {{ formatDate(col, setDateFormat()) }}
               </th>
-              <th class="text-center align-middle total-cell total-week">
+              <th class="text-center align-middle total-cell total-week header-total">
                 <div class="d-flex align-items-center">
                   <div>
                     Week<br>Total
                   </div>
-                  <div class="sort-arrows d-flex flex-column ml-2 mb-3">
+                  <div class="sort-arrows d-flex flex-column ml-1 mb-3">
                     <font-awesome-icon
                         :class="{'sort-arrow': true, 'selected': sortCol === 'periodTotal' && sortDir === 'asc'}"
                         icon="fa-solid fa-caret-up"
@@ -65,12 +69,14 @@
                   </div>
                 </div>
               </th>
-              <th class="text-center align-middle total-cell total-overall">
+              <th v-if="windowWidth > getMediaBreakpoint('md') || windowWidth < getMediaBreakpoint('sm')"
+                  class="text-center align-middle total-cell total-overall header-total"
+              >
                 <div class="d-flex align-items-center">
                   <div>
                     Overall<br>Total
                   </div>
-                  <div class="sort-arrows d-flex flex-column ml-2 mb-3">
+                  <div class="sort-arrows d-flex flex-column ml-1 mb-3">
 <!--                    https://dribbble.com/shots/6827054-Data-website-Filters-sorting-data-table/attachments/6827054-Data-website-Filters-sorting-data-table?mode=media-->
                     <font-awesome-icon
                         :class="{'sort-arrow': true, 'selected': sortCol === 'overallTotal' && sortDir === 'asc'}"
@@ -87,8 +93,8 @@
                   </div>
                 </div>
               </th>
-              <th class="text-center align-middle">
-                <span class="sr-only">Add score</span>
+              <th class="text-center align-middle header-extra">
+                <span class="sr-only">Add score or view additional details</span>
               </th>
             </tr>
             <tr class="empty" aria-hidden="true">
@@ -132,12 +138,14 @@
                   {{ player.periodTotal }}
                 </td>
 
-                <td class="text-center align-middle total-cell total-overall">
+                <td v-if="windowWidth > getMediaBreakpoint('md') || windowWidth < getMediaBreakpoint('sm')"
+                    class="text-center align-middle total-cell total-overall"
+                >
                   {{ player.overallTotal }}
                 </td>
 
                 <td class="text-center align-middle">
-                  <div class="d-flex edit-btn-container">
+                  <div class="d-flex edit-btn-container justify-content-end">
                     <button @click="editingPlayer=player; showModal=true"
                       class="btn btn-icon btn-table btn-primary" data-bs-toggle="tooltip"
                       data-placement="left" title="Add or edit score"
@@ -673,9 +681,7 @@ export default {
     setDateFormat() {
       //https://date-fns.org/v2.29.3/docs/format
       //TODO: update once other period types available
-      if (this.windowWidth <= getMediaBreakpoint("md")) {
-        this.dateFormat = "EEEEE";
-      } else if (this.windowWidth <= getMediaBreakpoint("lg")) {
+      if (this.windowWidth <= getMediaBreakpoint("lg")) {
         this.dateFormat = "EEEEEE";
       } else {
         this.dateFormat = "EEE";
